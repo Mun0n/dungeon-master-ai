@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "id": "fixture_watch",
+  "title": "Fixture Watch",
+  "clock": {
+    "startHour": 22,
+    "startMinute": 0,
+    "midnightEventId": "bells"
+  },
+  "startLocationId": "yard",
+  "deathEndingId": "death",
+  "acts": [
+    {
+      "id": "act_arrival",
+      "title": "Arrival",
+      "locationIds": ["yard", "hall"]
+    },
+    {
+      "id": "act_below",
+      "title": "Below",
+      "locationIds": ["cellar"]
+    }
+  ],
+  "locations": [
+    { "id": "yard", "name": "Yard", "actId": "act_arrival" },
+    { "id": "hall", "name": "Hall", "actId": "act_arrival" },
+    { "id": "cellar", "name": "Cellar", "actId": "act_below" }
+  ],
+  "npcs": [
+    {
+      "id": "warden",
+      "name": "Warden",
+      "states": ["watching", "spared", "lost"],
+      "initialState": "watching"
+    },
+    {
+      "id": "clerk",
+      "name": "Clerk",
+      "states": ["present"],
+      "initialState": "present"
+    }
+  ],
+  "items": [
+    { "id": "brass_key", "name": "Brass Key" },
+    { "id": "bandage", "name": "Bandage" },
+    { "id": "pack_1", "name": "Pack One" },
+    { "id": "pack_2", "name": "Pack Two" },
+    { "id": "pack_3", "name": "Pack Three" },
+    { "id": "pack_4", "name": "Pack Four" },
+    { "id": "pack_5", "name": "Pack Five" }
+  ],
+  "flags": [
+    { "id": "door_open", "default": false },
+    { "id": "keeper_spared", "default": false },
+    { "id": "hatch_open", "default": false },
+    { "id": "truth_known", "default": false },
+    { "id": "truth_public", "default": false },
+    { "id": "chose_violence", "default": false },
+    { "id": "chose_silence", "default": false },
+    { "id": "gave_up", "default": false },
+    { "id": "climbed", "default": false }
+  ],
+  "evidences": [
+    { "id": "proof_archive", "text": "A copied shelf entry." },
+    { "id": "proof_crypt", "text": "A marked cellar sample." },
+    { "id": "proof_notes", "text": "A set of working notes." },
+    { "id": "proof_mark", "text": "A matching mark." }
+  ],
+  "clues": [
+    { "id": "clue_bell", "text": "The yard bell is a test clue." },
+    { "id": "clue_name", "text": "The clerk repeats a test name." }
+  ],
+  "deductions": [
+    {
+      "id": "named_conclusion",
+      "evidenceIds": ["proof_archive", "proof_crypt", "proof_notes", "proof_mark"],
+      "flag": "truth_known"
+    }
+  ],
+  "endings": [
+    {
+      "id": "justice",
+      "requirements": {
+        "flagIds": ["truth_known", "truth_public"],
+        "evidenceIds": ["proof_archive", "proof_crypt", "proof_notes", "proof_mark"]
+      }
+    },
+    {
+      "id": "vengeance",
+      "requirements": {
+        "flagIds": ["truth_known", "chose_violence"]
+      }
+    },
+    {
+      "id": "silence",
+      "requirements": {
+        "flagIds": ["truth_known", "chose_silence"]
+      }
+    },
+    {
+      "id": "failure",
+      "requirements": {
+        "flagIds": ["gave_up"]
+      }
+    },
+    {
+      "id": "death",
+      "requirements": {}
+    }
+  ],
+  "events": [
+    {
+      "id": "bells",
+      "effects": [
+        { "type": "SET_NPC_STATE", "npcId": "warden", "state": "lost" }
+      ],
+      "whenFlag": "keeper_spared",
+      "whenFlagEffects": [
+        { "type": "SET_NPC_STATE", "npcId": "warden", "state": "spared" }
+      ]
+    },
+    {
+      "id": "bell_note",
+      "effects": [
+        { "type": "ADD_CLUE", "clueId": "clue_name" }
+      ]
+    }
+  ],
+  "sceneContracts": [
+    {
+      "id": "yard_contract",
+      "locationId": "yard",
+      "purpose": "A test yard with no plot.",
+      "allowedActionIds": ["search_yard", "warn_keeper", "walk_away"],
+      "presentNpcIds": ["warden"],
+      "revealableInformation": ["The yard is a test."],
+      "forbiddenInformation": ["No hidden solution is stored here."]
+    }
+  ],
+  "actions": [
+    {
+      "id": "search_yard",
+      "locationId": "yard",
+      "timeCostMinutes": 30,
+      "success": {
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_bell" },
+          { "type": "ADD_ITEM", "itemId": "brass_key" }
+        ]
+      }
+    },
+    {
+      "id": "open_hall",
+      "locationId": "yard",
+      "timeCostMinutes": 10,
+      "availability": { "itemIds": ["brass_key"] },
+      "success": {
+        "effects": [
+          { "type": "DISCOVER_LOCATION", "locationId": "hall" },
+          { "type": "MOVE_TO", "locationId": "hall" },
+          { "type": "SET_FLAG", "key": "door_open", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "read_archive",
+      "locationId": "hall",
+      "timeCostMinutes": 20,
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 12 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_archive" }
+        ]
+      },
+      "failure": { "effects": [] },
+      "retry": { "reopenWhen": { "clueIds": ["clue_bell"] } }
+    },
+    {
+      "id": "copy_archive",
+      "locationId": "hall",
+      "timeCostMinutes": 25,
+      "availability": { "flagIds": ["door_open"] },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_archive" }
+        ]
+      }
+    },
+    {
+      "id": "ask_clerk",
+      "locationId": "hall",
+      "timeCostMinutes": 15,
+      "success": {
+        "effects": [
+          { "type": "SET_RELATIONSHIP", "npcId": "clerk", "value": 1 },
+          { "type": "ADD_CLUE", "clueId": "clue_name" }
+        ]
+      }
+    },
+    {
+      "id": "trade_notes",
+      "locationId": "hall",
+      "timeCostMinutes": 10,
+      "availability": {
+        "relationships": [{ "npcId": "clerk", "atLeast": 1 }]
+      },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_notes" }
+        ]
+      }
+    },
+    {
+      "id": "study_notes",
+      "locationId": "hall",
+      "timeCostMinutes": 20,
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 8 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_notes" }
+        ]
+      },
+      "failure": { "effects": [] }
+    },
+    {
+      "id": "descend",
+      "locationId": "hall",
+      "timeCostMinutes": 15,
+      "availability": { "flagIds": ["door_open"] },
+      "success": {
+        "effects": [
+          { "type": "DISCOVER_LOCATION", "locationId": "cellar" },
+          { "type": "MOVE_TO", "locationId": "cellar" }
+        ]
+      }
+    },
+    {
+      "id": "return_hall",
+      "locationId": "cellar",
+      "timeCostMinutes": 10,
+      "availability": { "discoveredLocationIds": ["hall"] },
+      "success": {
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "hall" }
+        ]
+      }
+    },
+    {
+      "id": "search_cellar",
+      "locationId": "cellar",
+      "timeCostMinutes": 20,
+      "check": { "attribute": "AGILITY", "difficulty": 12 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_crypt" }
+        ]
+      },
+      "failure": {
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -1 }
+        ]
+      },
+      "retry": { "reopenWhen": { "itemIds": ["brass_key"] } }
+    },
+    {
+      "id": "pry_cellar",
+      "locationId": "cellar",
+      "timeCostMinutes": 15,
+      "check": { "attribute": "STRENGTH", "difficulty": 12 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_crypt" }
+        ]
+      },
+      "failure": { "effects": [] }
+    },
+    {
+      "id": "compare_marks",
+      "locationId": "hall",
+      "timeCostMinutes": 20,
+      "availability": { "evidenceIds": ["proof_notes"] },
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 16 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_mark" }
+        ]
+      },
+      "failure": { "effects": [] }
+    },
+    {
+      "id": "dust_mark",
+      "locationId": "cellar",
+      "timeCostMinutes": 15,
+      "check": { "attribute": "AGILITY", "difficulty": 8 },
+      "success": {
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "proof_mark" }
+        ]
+      },
+      "failure": { "effects": [] }
+    },
+    {
+      "id": "warn_keeper",
+      "locationId": "yard",
+      "timeCostMinutes": 20,
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "keeper_spared", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "publish_truth",
+      "locationId": "hall",
+      "timeCostMinutes": 10,
+      "availability": {
+        "deductionIds": ["named_conclusion"],
+        "evidenceIds": ["proof_archive", "proof_crypt", "proof_notes", "proof_mark"]
+      },
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "truth_public", "value": true },
+          { "type": "SET_ENDING", "endingId": "justice" }
+        ]
+      }
+    },
+    {
+      "id": "strike_culprit",
+      "locationId": "hall",
+      "timeCostMinutes": 10,
+      "availability": { "deductionIds": ["named_conclusion"] },
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "chose_violence", "value": true },
+          { "type": "SET_ENDING", "endingId": "vengeance" }
+        ]
+      }
+    },
+    {
+      "id": "bury_truth",
+      "locationId": "hall",
+      "timeCostMinutes": 10,
+      "availability": { "deductionIds": ["named_conclusion"] },
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "chose_silence", "value": true },
+          { "type": "SET_ENDING", "endingId": "silence" }
+        ]
+      }
+    },
+    {
+      "id": "walk_away",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "gave_up", "value": true },
+          { "type": "SET_ENDING", "endingId": "failure" }
+        ]
+      }
+    },
+    {
+      "id": "reckless_climb",
+      "locationId": "yard",
+      "timeCostMinutes": 10,
+      "check": { "attribute": "STRENGTH", "difficulty": 20 },
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "climbed", "value": true }
+        ]
+      },
+      "failure": {
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -10 }
+        ]
+      }
+    },
+    {
+      "id": "find_bandage",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "ADD_ITEM", "itemId": "bandage" }
+        ]
+      }
+    },
+    {
+      "id": "find_bandage_again",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "ADD_ITEM", "itemId": "bandage" }
+        ]
+      }
+    },
+    {
+      "id": "bind_wound",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "availability": { "itemIds": ["bandage"] },
+      "success": {
+        "effects": [
+          { "type": "REMOVE_ITEM", "itemId": "bandage" },
+          { "type": "CHANGE_LIFE", "amount": 4 }
+        ]
+      }
+    },
+    {
+      "id": "fill_pack",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "ADD_ITEM", "itemId": "pack_1" },
+          { "type": "ADD_ITEM", "itemId": "pack_2" },
+          { "type": "ADD_ITEM", "itemId": "pack_3" },
+          { "type": "ADD_ITEM", "itemId": "pack_4" },
+          { "type": "ADD_ITEM", "itemId": "pack_5" }
+        ]
+      }
+    },
+    {
+      "id": "overfill",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "ADD_ITEM", "itemId": "pack_1" },
+          { "type": "ADD_ITEM", "itemId": "pack_2" },
+          { "type": "ADD_ITEM", "itemId": "pack_3" },
+          { "type": "ADD_ITEM", "itemId": "pack_4" },
+          { "type": "ADD_ITEM", "itemId": "pack_5" },
+          { "type": "ADD_ITEM", "itemId": "bandage" }
+        ]
+      }
+    },
+    {
+      "id": "force_hatch",
+      "locationId": "yard",
+      "timeCostMinutes": 10,
+      "check": { "attribute": "STRENGTH", "difficulty": 16 },
+      "success": {
+        "effects": [
+          { "type": "SET_FLAG", "key": "hatch_open", "value": true }
+        ]
+      },
+      "failure": {
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -1 }
+        ]
+      },
+      "retry": { "reopenWhen": { "itemIds": ["brass_key"] } }
+    },
+    {
+      "id": "seal_hatch",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "RECORD_ATTEMPT", "actionId": "force_hatch" }
+        ]
+      }
+    },
+    {
+      "id": "ring_bell",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "TRIGGER_EVENT", "eventId": "bell_note" }
+        ]
+      }
+    },
+    {
+      "id": "ring_bell_again",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": {
+        "effects": [
+          { "type": "TRIGGER_EVENT", "eventId": "bell_note" }
+        ]
+      }
+    },
+    {
+      "id": "wait_long",
+      "locationId": "yard",
+      "timeCostMinutes": 100,
+      "success": { "effects": [] }
+    },
+    {
+      "id": "wait_short",
+      "locationId": "yard",
+      "timeCostMinutes": 30,
+      "success": { "effects": [] }
+    },
+    {
+      "id": "wait_past",
+      "locationId": "yard",
+      "timeCostMinutes": 130,
+      "success": { "effects": [] }
+    },
+    {
+      "id": "look_around",
+      "locationId": "yard",
+      "timeCostMinutes": 5,
+      "success": { "effects": [] }
+    }
+  ]
+}

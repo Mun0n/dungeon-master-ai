@@ -1,0 +1,1242 @@
+{
+  "schemaVersion": 1,
+  "id": "valdumbria",
+  "title": "Las campanas de Valdumbría",
+  "narrativeLanguage": "es",
+  "clock": {
+    "startHour": 22,
+    "startMinute": 0,
+    "midnightEventId": "midnight_bells"
+  },
+  "startLocationId": "plaza",
+  "deathEndingId": "death",
+  "acts": [
+    {
+      "id": "act_arrival",
+      "title": "Llegada",
+      "locationIds": ["plaza", "tavern"]
+    },
+    {
+      "id": "act_investigation",
+      "title": "Investigación",
+      "locationIds": ["church", "cemetery", "archive"]
+    },
+    {
+      "id": "act_consequences",
+      "title": "Medianoche y consecuencias",
+      "locationIds": ["crypt"]
+    }
+  ],
+  "locations": [
+    { "id": "plaza", "name": "Plaza", "actId": "act_arrival" },
+    { "id": "tavern", "name": "Taberna", "actId": "act_arrival" },
+    { "id": "church", "name": "Iglesia", "actId": "act_investigation" },
+    { "id": "cemetery", "name": "Cementerio", "actId": "act_investigation" },
+    { "id": "archive", "name": "Archivo", "actId": "act_investigation" },
+    { "id": "crypt", "name": "Cripta", "actId": "act_consequences" }
+  ],
+  "npcs": [
+    {
+      "id": "elia",
+      "name": "Elia",
+      "states": ["dead"],
+      "initialState": "dead"
+    },
+    {
+      "id": "alden",
+      "name": "Padre Aldren",
+      "states": ["present", "absent"],
+      "initialState": "present"
+    },
+    {
+      "id": "mara",
+      "name": "Mara",
+      "states": ["working", "withdrawn"],
+      "initialState": "working"
+    },
+    {
+      "id": "beltran",
+      "name": "Don Beltrán",
+      "states": ["guarded", "withdrawn"],
+      "initialState": "guarded"
+    },
+    {
+      "id": "tomas",
+      "name": "Tomás",
+      "states": ["digging", "withdrawn"],
+      "initialState": "digging"
+    },
+    {
+      "id": "ines",
+      "name": "Inés",
+      "states": ["unwarned", "saved", "lost"],
+      "initialState": "unwarned"
+    }
+  ],
+  "items": [
+    { "id": "iron_pin", "name": "Ganzúa de Tomás" },
+    { "id": "linen_bandage", "name": "Lino de Mara" }
+  ],
+  "flags": [
+    { "id": "letter_read" },
+    { "id": "prologue_road" },
+    { "id": "prologue_arrival" },
+    { "id": "prologue_grave" },
+    { "id": "ines_protected" },
+    { "id": "alden_away" },
+    { "id": "tomas_showed_path" },
+    { "id": "gave_up" },
+    { "id": "chose_violence" },
+    { "id": "chose_silence" },
+    { "id": "truth_public" },
+    { "id": "suspicion_noted" },
+    { "id": "truth_known" }
+  ],
+  "evidences": [
+    {
+      "id": "evidence_record",
+      "text": "Los registros históricos de Valdumbría fueron manipulados para borrar nombres."
+    },
+    {
+      "id": "evidence_crypt",
+      "text": "La cripta guarda restos de personas sanas encerradas junto a los enfermos."
+    },
+    {
+      "id": "evidence_elia",
+      "text": "La investigación final de Elia señala a Padre Aldren. Elia está muerta."
+    },
+    {
+      "id": "evidence_alden",
+      "text": "Una lista oculta incrimina a Padre Aldren en las desapariciones recientes."
+    }
+  ],
+  "clues": [
+    {
+      "id": "clue_letter",
+      "text": "Elia escribió desde Valdumbría pidiendo ayuda. No explica qué ha encontrado."
+    },
+    {
+      "id": "clue_elia_dead",
+      "text": "Elia ha muerto. Tomás la ha enterrado en el cementerio."
+    },
+    {
+      "id": "clue_ines_summoned",
+      "text": "El párroco citó a Inés en la iglesia antes de medianoche."
+    },
+    {
+      "id": "clue_bells",
+      "text": "Las campanas de la iglesia suenan a medianoche."
+    },
+    {
+      "id": "clue_rumor_creature",
+      "text": "En la taberna se habla de una criatura bajo el cementerio."
+    },
+    {
+      "id": "clue_elia_at_church",
+      "text": "Mara vio a Elia caminar hacia la iglesia."
+    },
+    {
+      "id": "clue_founders",
+      "text": "Don Beltrán desciende de las familias que guardan el registro viejo."
+    },
+    {
+      "id": "clue_crypt_entrance",
+      "text": "Hay un paso desde el cementerio hasta la cripta."
+    },
+    {
+      "id": "clue_fresh_marks",
+      "text": "El hueco de la cripta tiene marcas recientes."
+    }
+  ],
+  "deductions": [
+    {
+      "id": "name_the_crime",
+      "evidenceIds": [
+        "evidence_record",
+        "evidence_crypt",
+        "evidence_elia",
+        "evidence_alden"
+      ],
+      "flag": "truth_known",
+      "statement": "Las cuatro pruebas coinciden. Durante la epidemia, Padre Aldren encerró a personas sanas con los enfermos e hizo alterar los registros para ocultar aquel crimen. Los asesinatos recientes, incluida la muerte de Elia, mantienen ese encierro en secreto. La lista escondida lo señala a él. Don Beltrán, Mara, Tomás y la criatura de la taberna no son la causa. Elia no puede volver. Lo que le ocurra a Inés no cambia esta conclusión.",
+      "localProse": "Las cuatro pruebas coinciden. Durante la epidemia, Padre Aldren encerró a personas sanas con los enfermos e hizo alterar los registros para ocultar aquel crimen. Los asesinatos recientes, incluida la muerte de Elia, mantienen ese encierro en secreto. La lista escondida lo señala a él. Don Beltrán, Mara, Tomás y la criatura de la taberna no son la causa. Elia no puede volver. Lo que le ocurra a Inés no cambia esta conclusión.",
+      "claims": [
+        {
+          "id": "recent_killings",
+          "prompt": "¿A quién culpa la frase de los asesinatos recientes?",
+          "options": [
+            { "id": "alden", "gloss": "Culpa a Padre Aldren." },
+            { "id": "beltran", "gloss": "Culpa a Don Beltrán." },
+            { "id": "mara", "gloss": "Culpa a Mara." },
+            { "id": "tomas", "gloss": "Culpa a Tomás." },
+            { "id": "creature", "gloss": "Culpa a la criatura de la taberna." },
+            { "id": "unknown", "gloss": "No atribuye los asesinatos a nadie." }
+          ],
+          "accept": ["alden"],
+          "falseValues": ["beltran", "mara", "tomas", "creature"]
+        },
+        {
+          "id": "confinement",
+          "prompt": "¿Qué dice la frase que ocurrió con las personas sanas durante la epidemia?",
+          "options": [
+            { "id": "shut_in_with_the_sick", "gloss": "Encerró a personas sanas con los enfermos." },
+            { "id": "treated_and_released", "gloss": "Las atendió y las dejó marchar." },
+            { "id": "never_happened", "gloss": "Ese encierro no ocurrió." },
+            { "id": "unknown", "gloss": "No dice qué pasó con las personas sanas." }
+          ],
+          "accept": ["shut_in_with_the_sick"]
+        },
+        {
+          "id": "records",
+          "prompt": "¿Qué dice la frase sobre los registros históricos?",
+          "options": [
+            { "id": "altered_to_conceal", "gloss": "Los registros fueron alterados para ocultar el crimen." },
+            { "id": "records_are_accurate", "gloss": "Los registros históricos son exactos." },
+            { "id": "unknown", "gloss": "No dice qué pasó con los registros." }
+          ],
+          "accept": ["altered_to_conceal"]
+        },
+        {
+          "id": "connection",
+          "prompt": "¿Cómo relaciona la frase los asesinatos recientes con el crimen anterior?",
+          "options": [
+            { "id": "recent_killings_conceal_the_epidemic", "gloss": "Los asesinatos recientes mantienen oculto aquel encierro." },
+            { "id": "recent_killings_are_unrelated", "gloss": "Los asesinatos recientes no tienen relación con el crimen anterior." },
+            { "id": "there_was_no_older_crime", "gloss": "No hubo un crimen anterior." },
+            { "id": "unknown", "gloss": "No relaciona los asesinatos con un crimen anterior." }
+          ],
+          "accept": ["recent_killings_conceal_the_epidemic"]
+        }
+      ],
+      "contradictions": [
+        {
+          "leftClaimId": "confinement",
+          "leftValue": "never_happened",
+          "rightClaimId": "connection",
+          "rightValue": "recent_killings_conceal_the_epidemic"
+        },
+        {
+          "leftClaimId": "records",
+          "leftValue": "records_are_accurate",
+          "rightClaimId": "connection",
+          "rightValue": "recent_killings_conceal_the_epidemic"
+        },
+        {
+          "leftClaimId": "confinement",
+          "leftValue": "never_happened",
+          "rightClaimId": "records",
+          "rightValue": "altered_to_conceal"
+        },
+        {
+          "leftClaimId": "connection",
+          "leftValue": "there_was_no_older_crime",
+          "rightClaimId": "records",
+          "rightValue": "altered_to_conceal"
+        }
+      ]
+    }
+  ],
+  "endings": [
+    {
+      "id": "justice",
+      "requirements": {
+        "flagIds": ["truth_known", "truth_public"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ],
+        "deductionIds": ["name_the_crime"]
+      }
+    },
+    {
+      "id": "vengeance",
+      "requirements": {
+        "flagIds": ["truth_known", "chose_violence"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ],
+        "deductionIds": ["name_the_crime"]
+      }
+    },
+    {
+      "id": "silence",
+      "requirements": {
+        "flagIds": ["truth_known", "chose_silence"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ],
+        "deductionIds": ["name_the_crime"]
+      }
+    },
+    {
+      "id": "failure",
+      "requirements": {
+        "flagIds": ["gave_up"]
+      }
+    },
+    {
+      "id": "death",
+      "requirements": {}
+    }
+  ],
+  "events": [
+    {
+      "id": "midnight_bells",
+      "whenFlag": "ines_protected",
+      "effects": [
+        { "type": "SET_NPC_STATE", "npcId": "ines", "state": "lost" },
+        { "type": "SET_FLAG", "key": "alden_away", "value": true },
+        { "type": "SET_NPC_STATE", "npcId": "alden", "state": "absent" }
+      ],
+      "whenFlagEffects": [
+        { "type": "SET_NPC_STATE", "npcId": "ines", "state": "saved" },
+        { "type": "SET_FLAG", "key": "alden_away", "value": true },
+        { "type": "SET_NPC_STATE", "npcId": "alden", "state": "absent" }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "read_elias_letter",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": { "absentFlagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Lees la carta de Elia.\n\n«Viejo amigo:\n\nNo sé si te sorprenderá recibir noticias mías después de tantos años. Ojalá pudiera decirte que escribo para recordar viejos tiempos.\n\nEstoy en un pueblo llamado Valdumbría. He encontrado algo que no consigo explicar, y cuanto más pregunto, menos respuestas obtengo.\n\nNecesito a alguien en quien pueda confiar. Alguien que no tenga nada que ver con este lugar.\n\nVen cuanto antes. Te lo contaré todo cuando llegues.\n\nElia.»\n\nNo nombra a nadie ni explica qué ha encontrado.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_letter" },
+          { "type": "SET_FLAG", "key": "letter_read", "value": true },
+          { "type": "DISCOVER_LOCATION", "locationId": "tavern" }
+        ]
+      }
+    },
+    {
+      "id": "speak_with_ines",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "ines", "state": "unwarned" }]
+      },
+      "success": {
+        "localProse": "Inés, la maestra, espera en la plaza. Dice que el párroco le ha pedido llevar los cuadernos de la escuela a la iglesia antes de medianoche. Habla contigo en persona.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_ines_summoned" }
+        ]
+      }
+    },
+    {
+      "id": "look_over_the_square",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": { "flagIds": ["letter_read"] },
+      "check": { "attribute": "AGILITY", "difficulty": 8 },
+      "success": {
+        "localProse": "Entre las sombras distingues el campanario. Alguien comenta que las campanas suenan cada medianoche.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_bells" }
+        ]
+      },
+      "failure": {
+        "localProse": "La plaza está oscura y no distingues nada útil."
+      },
+      "retry": { "reopenWhen": { "flagIds": ["letter_read"] } }
+    },
+    {
+      "id": "go_to_tavern",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "discoveredLocationIds": ["tavern"] },
+      "success": {
+        "localProse": "Cruzas la plaza y entras en la taberna.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "tavern" }
+        ]
+      }
+    },
+    {
+      "id": "ask_mara",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "mara", "state": "working" }]
+      },
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 8 },
+      "success": {
+        "localProse": "Mara baja la voz. Cuenta que las campanas suenan a medianoche, que la gente habla de una criatura bajo el cementerio y que vio a Elia caminar hacia la iglesia.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_rumor_creature" },
+          { "type": "ADD_CLUE", "clueId": "clue_elia_at_church" },
+          { "type": "ADD_CLUE", "clueId": "clue_bells" }
+        ]
+      },
+      "failure": {
+        "localProse": "Mara se encoge de hombros y sigue con los vasos."
+      },
+      "retry": { "reopenWhen": { "flagIds": ["letter_read"] } }
+    },
+    {
+      "id": "sit_with_the_regulars",
+      "locationId": "tavern",
+      "timeCostMinutes": 15,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "mara", "state": "working" }]
+      },
+      "success": {
+        "localProse": "Te quedas a escuchar. Los parroquianos repiten lo de las campanas, lo de una criatura bajo el cementerio y que Elia fue vista camino de la iglesia.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_rumor_creature" },
+          { "type": "ADD_CLUE", "clueId": "clue_elia_at_church" },
+          { "type": "ADD_CLUE", "clueId": "clue_bells" }
+        ]
+      }
+    },
+    {
+      "id": "go_to_plaza",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "clueIds": ["clue_rumor_creature"] },
+      "success": {
+        "localProse": "Sales de la taberna y vuelves a la plaza.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "plaza" }
+        ]
+      }
+    },
+    {
+      "id": "warn_ines",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": {
+        "beforeMidnight": true,
+        "clueIds": ["clue_ines_summoned"],
+        "npcStates": [{ "npcId": "ines", "state": "unwarned" }]
+      },
+      "success": {
+        "localProse": "Dejas el aviso a Inés. Si las campanas han sonado en este mismo trance, el aviso llega tarde.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "ines_protected", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "speak_with_beltran",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "beltran", "state": "guarded" }]
+      },
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 12 },
+      "success": {
+        "localProse": "Don Beltrán admite que su familia guarda el registro viejo y señala el archivo.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_founders" },
+          { "type": "DISCOVER_LOCATION", "locationId": "archive" }
+        ]
+      },
+      "failure": {
+        "localProse": "Don Beltrán desvía la conversación y no suelta el registro."
+      },
+      "retry": { "reopenWhen": { "clueIds": ["clue_rumor_creature"] } }
+    },
+    {
+      "id": "note_suspicion",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Anotas una sospecha. Nadie la confirma.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "suspicion_noted", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "accuse_beltran",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "beltran", "state": "guarded" }]
+      },
+      "success": {
+        "localProse": "Acusas a Don Beltrán en la plaza. Se cierra y se marcha.",
+        "effects": [
+          { "type": "SET_NPC_STATE", "npcId": "beltran", "state": "withdrawn" }
+        ]
+      }
+    },
+    {
+      "id": "leave_valdumbria",
+      "locationId": "plaza",
+      "timeCostMinutes": 0,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Abandonas Valdumbría sin resolver nada.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "gave_up", "value": true },
+          { "type": "SET_ENDING", "endingId": "failure" }
+        ]
+      }
+    },
+    {
+      "id": "study_the_dark_tower",
+      "locationId": "plaza",
+      "timeCostMinutes": 5,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Localizas la iglesia al fondo de la plaza.",
+        "effects": [
+          { "type": "DISCOVER_LOCATION", "locationId": "church" }
+        ]
+      }
+    },
+    {
+      "id": "follow_elias_directions",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Preguntas por el edificio donde se guardan los papeles del pueblo y das con el archivo.",
+        "effects": [
+          { "type": "DISCOVER_LOCATION", "locationId": "archive" }
+        ]
+      }
+    },
+    {
+      "id": "enter_the_church",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "discoveredLocationIds": ["church"] },
+      "success": {
+        "localProse": "Empujas la puerta de la iglesia.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "church" }
+        ]
+      }
+    },
+    {
+      "id": "enter_the_archive",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "discoveredLocationIds": ["archive"] },
+      "success": {
+        "localProse": "Entras en el archivo.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "archive" }
+        ]
+      }
+    },
+    {
+      "id": "enter_the_cemetery",
+      "locationId": "plaza",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "discoveredLocationIds": ["cemetery"] },
+      "success": {
+        "localProse": "Tomas el camino del cementerio.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "cemetery" }
+        ]
+      }
+    },
+    {
+      "id": "follow_the_path_behind_the_inn",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Detrás de la taberna encuentras el camino del cementerio.",
+        "effects": [
+          { "type": "DISCOVER_LOCATION", "locationId": "cemetery" }
+        ]
+      }
+    },
+    {
+      "id": "ask_mara_for_linen",
+      "locationId": "tavern",
+      "timeCostMinutes": 5,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "mara", "state": "working" }]
+      },
+      "success": {
+        "localProse": "Mara te da un trozo de lino limpio.",
+        "effects": [
+          { "type": "ADD_ITEM", "itemId": "linen_bandage" }
+        ]
+      }
+    },
+    {
+      "id": "bind_a_wound",
+      "locationId": "tavern",
+      "timeCostMinutes": 5,
+      "availability": { "itemIds": ["linen_bandage"] },
+      "success": {
+        "localProse": "Te vendas con el lino. La herida cede un poco.",
+        "effects": [
+          { "type": "REMOVE_ITEM", "itemId": "linen_bandage" },
+          { "type": "CHANGE_LIFE", "amount": 2 }
+        ]
+      }
+    },
+    {
+      "id": "mara_kept_the_packet",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "availability": {
+        "clueIds": ["clue_elia_at_church"],
+        "npcStates": [{ "npcId": "mara", "state": "working" }]
+      },
+      "success": {
+        "localProse": "Mara guardaba el paquete de notas. La investigación final de Elia señala a Padre Aldren. Elia está muerta.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_elia" }
+        ]
+      }
+    },
+    {
+      "id": "accuse_mara",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "mara", "state": "working" }]
+      },
+      "success": {
+        "localProse": "Acusas a Mara delante de la sala. Deja de hablarte.",
+        "effects": [
+          { "type": "SET_NPC_STATE", "npcId": "mara", "state": "withdrawn" }
+        ]
+      }
+    },
+    {
+      "id": "leave_the_tavern",
+      "locationId": "tavern",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": {
+        "npcStates": [{ "npcId": "mara", "state": "withdrawn" }],
+        "absentClueIds": ["clue_rumor_creature"]
+      },
+      "success": {
+        "localProse": "Sales de la taberna y vuelves a la plaza.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "plaza" }
+        ]
+      }
+    },
+    {
+      "id": "search_vestry",
+      "locationId": "church",
+      "timeCostMinutes": 15,
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 16 },
+      "success": {
+        "localProse": "En la sacristía encuentras la lista que incrimina a Padre Aldren.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_alden" }
+        ]
+      },
+      "failure": {
+        "localProse": "Registras la sacristía y no das con la lista."
+      },
+      "retry": { "reopenWhen": { "flagIds": ["alden_away"] } }
+    },
+    {
+      "id": "take_the_hidden_list",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "afterMidnight": true,
+        "flagIds": ["alden_away"]
+      },
+      "success": {
+        "localProse": "Con Aldren fuera, la lista oculta queda a la vista.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_alden" }
+        ]
+      }
+    },
+    {
+      "id": "bar_the_vestry",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "beforeMidnight": true,
+        "clueIds": ["clue_ines_summoned"],
+        "npcStates": [{ "npcId": "alden", "state": "present" }]
+      },
+      "check": { "attribute": "STRENGTH", "difficulty": 16 },
+      "success": {
+        "localProse": "Cierras el paso en la sacristía. Si las campanas han sonado en este mismo trance, llegas tarde.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "ines_protected", "value": true }
+        ]
+      },
+      "failure": {
+        "localProse": "No logras cerrar el paso y sales magullado.",
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -2 }
+        ]
+      },
+      "retry": { "reopenWhen": { "itemIds": ["iron_pin"] } }
+    },
+    {
+      "id": "accuse_alden_early",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "beforeMidnight": true,
+        "clueIds": ["clue_ines_summoned"],
+        "npcStates": [{ "npcId": "alden", "state": "present" }],
+        "absentFlagIds": ["truth_known"]
+      },
+      "success": {
+        "localProse": "Lo acusas antes de tener la prueba completa. Aldren se retira. Inés no queda protegida por esto.",
+        "effects": [
+          { "type": "SET_NPC_STATE", "npcId": "alden", "state": "absent" },
+          { "type": "SET_FLAG", "key": "alden_away", "value": true }
+        ]
+      }
+    },
+    {
+      "id": "publish_the_truth",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "deductionIds": ["name_the_crime"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ]
+      },
+      "success": {
+        "localProse": "Haces pública la verdad del encierro y de los asesinatos recientes.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "truth_public", "value": true },
+          { "type": "SET_ENDING", "endingId": "justice" }
+        ]
+      }
+    },
+    {
+      "id": "take_vengeance",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "deductionIds": ["name_the_crime"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ]
+      },
+      "success": {
+        "localProse": "Eliges la violencia contra el responsable.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "chose_violence", "value": true },
+          { "type": "SET_ENDING", "endingId": "vengeance" }
+        ]
+      }
+    },
+    {
+      "id": "keep_the_secret",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "availability": {
+        "deductionIds": ["name_the_crime"],
+        "evidenceIds": [
+          "evidence_record",
+          "evidence_crypt",
+          "evidence_elia",
+          "evidence_alden"
+        ]
+      },
+      "success": {
+        "localProse": "Eliges callar la verdad.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "chose_silence", "value": true },
+          { "type": "SET_ENDING", "endingId": "silence" }
+        ]
+      }
+    },
+    {
+      "id": "leave_the_church",
+      "locationId": "church",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "success": {
+        "localProse": "Sales de la iglesia a la plaza.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "plaza" }
+        ]
+      }
+    },
+    {
+      "id": "ask_tomas",
+      "locationId": "cemetery",
+      "timeCostMinutes": 10,
+      "availability": {
+        "npcStates": [{ "npcId": "tomas", "state": "digging" }]
+      },
+      "success": {
+        "localProse": "Tomás no sabe cómo murió Elia. Le ordenaron enterrarla y no le dijeron quién. Después señala el paso a la cripta y te deja una ganzúa.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_crypt_entrance" },
+          { "type": "SET_FLAG", "key": "tomas_showed_path", "value": true },
+          { "type": "DISCOVER_LOCATION", "locationId": "crypt" },
+          { "type": "ADD_ITEM", "itemId": "iron_pin" }
+        ]
+      }
+    },
+    {
+      "id": "follow_the_sinking_ground",
+      "locationId": "cemetery",
+      "timeCostMinutes": 15,
+      "success": {
+        "localProse": "El suelo hundido marca otro paso hacia la cripta, sin la ganzúa.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_crypt_entrance" },
+          { "type": "DISCOVER_LOCATION", "locationId": "crypt" }
+        ]
+      }
+    },
+    {
+      "id": "read_burial_list",
+      "locationId": "cemetery",
+      "timeCostMinutes": 15,
+      "success": {
+        "localProse": "La lista de enterramientos no coincide con los nombres que el pueblo recuerda.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_record" }
+        ]
+      }
+    },
+    {
+      "id": "cut_alden_off",
+      "locationId": "cemetery",
+      "timeCostMinutes": 10,
+      "availability": {
+        "beforeMidnight": true,
+        "clueIds": ["clue_ines_summoned"]
+      },
+      "check": { "attribute": "AGILITY", "difficulty": 12 },
+      "success": {
+        "localProse": "Le cortas el paso entre las tumbas. Si las campanas han sonado en este mismo trance, llegas tarde.",
+        "effects": [
+          { "type": "SET_FLAG", "key": "ines_protected", "value": true }
+        ]
+      },
+      "failure": {
+        "localProse": "Tropiezas entre las losas y no llegas a cortarle el paso.",
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -1 }
+        ]
+      },
+      "retry": { "reopenWhen": { "flagIds": ["tomas_showed_path"] } }
+    },
+    {
+      "id": "accuse_tomas",
+      "locationId": "cemetery",
+      "timeCostMinutes": 10,
+      "availability": {
+        "flagIds": ["letter_read"],
+        "npcStates": [{ "npcId": "tomas", "state": "digging" }]
+      },
+      "success": {
+        "localProse": "Acusas a Tomás. Clava la pala y deja de ayudarte.",
+        "effects": [
+          { "type": "SET_NPC_STATE", "npcId": "tomas", "state": "withdrawn" }
+        ]
+      }
+    },
+    {
+      "id": "enter_the_crypt",
+      "locationId": "cemetery",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "availability": { "discoveredLocationIds": ["crypt"] },
+      "success": {
+        "localProse": "Bajas a la cripta.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "crypt" }
+        ]
+      }
+    },
+    {
+      "id": "leave_the_cemetery",
+      "locationId": "cemetery",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "success": {
+        "localProse": "Regresas del cementerio a la plaza.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "plaza" }
+        ]
+      }
+    },
+    {
+      "id": "read_elias_notes",
+      "locationId": "archive",
+      "timeCostMinutes": 15,
+      "availability": { "flagIds": ["letter_read"] },
+      "success": {
+        "localProse": "Las notas del archivo cierran la investigación de Elia. Elia está muerta. Padre Aldren acabó con ella antes de que llegaras.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_elia" }
+        ]
+      }
+    },
+    {
+      "id": "compare_registers",
+      "locationId": "archive",
+      "timeCostMinutes": 15,
+      "availability": { "flagIds": ["letter_read"] },
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 12 },
+      "success": {
+        "localProse": "Comparas los registros y ves los nombres borrados.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_record" }
+        ]
+      },
+      "failure": {
+        "localProse": "Los libros no te encajan todavía."
+      },
+      "retry": { "reopenWhen": { "clueIds": ["clue_founders"] } }
+    },
+    {
+      "id": "leave_the_archive",
+      "locationId": "archive",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "success": {
+        "localProse": "Cierras el archivo y vuelves a la plaza.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "plaza" }
+        ]
+      }
+    },
+    {
+      "id": "examine_sealed_niche",
+      "locationId": "crypt",
+      "timeCostMinutes": 15,
+      "check": { "attribute": "INTELLIGENCE", "difficulty": 12 },
+      "success": {
+        "localProse": "El nicho sellado conserva la prueba del encierro.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_crypt" }
+        ]
+      },
+      "failure": {
+        "localProse": "No logras leer el nicho."
+      },
+      "retry": { "reopenWhen": { "itemIds": ["iron_pin"] } }
+    },
+    {
+      "id": "trace_the_scratches",
+      "locationId": "crypt",
+      "timeCostMinutes": 20,
+      "success": {
+        "localProse": "Sigues las marcas despacio y reconstruyes lo que ocurrió en la cripta.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_crypt" }
+        ]
+      }
+    },
+    {
+      "id": "break_the_seal",
+      "locationId": "crypt",
+      "timeCostMinutes": 15,
+      "check": { "attribute": "STRENGTH", "difficulty": 16 },
+      "success": {
+        "localProse": "Rompes el sello y la prueba queda al descubierto.",
+        "effects": [
+          { "type": "ADD_EVIDENCE", "evidenceId": "evidence_crypt" }
+        ]
+      },
+      "failure": {
+        "localProse": "El sello te resiste y te hiere la mano.",
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -1 }
+        ]
+      },
+      "retry": { "reopenWhen": { "itemIds": ["iron_pin"] } }
+    },
+    {
+      "id": "descend_the_open_drop",
+      "locationId": "crypt",
+      "timeCostMinutes": 10,
+      "check": { "attribute": "AGILITY", "difficulty": 20 },
+      "success": {
+        "localProse": "Bajas por el hueco abierto y encuentras marcas recientes.",
+        "effects": [
+          { "type": "ADD_CLUE", "clueId": "clue_fresh_marks" }
+        ]
+      },
+      "failure": {
+        "localProse": "Caes por el hueco abierto. La caída es mortal.",
+        "effects": [
+          { "type": "CHANGE_LIFE", "amount": -10 }
+        ]
+      },
+      "retry": { "reopenWhen": { "flagIds": ["tomas_showed_path"] } }
+    },
+    {
+      "id": "return_to_the_cemetery",
+      "locationId": "crypt",
+      "timeCostMinutes": 10,
+      "repeatable": true,
+      "success": {
+        "localProse": "Subes de la cripta al cementerio.",
+        "effects": [
+          { "type": "MOVE_TO", "locationId": "cemetery" }
+        ]
+      }
+    }
+  ],
+  "sceneContracts": [
+    {
+      "id": "plaza_contract",
+      "locationId": "plaza",
+      "purpose": "Night in the village square. The player came because of Elia's letter. Mention her fate only when the revealed lines already state it. Do not name a killer, confirm a monster, or decide Inés.",
+      "allowedActionIds": [
+        "read_elias_letter",
+        "speak_with_ines",
+        "look_over_the_square",
+        "go_to_tavern",
+        "warn_ines",
+        "speak_with_beltran",
+        "note_suspicion",
+        "accuse_beltran",
+        "leave_valdumbria",
+        "study_the_dark_tower",
+        "follow_elias_directions",
+        "enter_the_church",
+        "enter_the_archive",
+        "enter_the_cemetery"
+      ],
+      "presentNpcIds": ["ines", "beltran"],
+      "revealableInformation": [
+        "Elia wrote a letter and is missing from the square.",
+        "The church bells are expected at midnight."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": true
+    },
+    {
+      "id": "tavern_contract",
+      "locationId": "tavern",
+      "purpose": "The tavern at night. Mara may share rumors. A rumor is not a fact. Do not confirm a monster or announce what happened to Elia unless this resolution's effects added that evidence.",
+      "allowedActionIds": [
+        "ask_mara",
+        "sit_with_the_regulars",
+        "go_to_plaza",
+        "follow_the_path_behind_the_inn",
+        "ask_mara_for_linen",
+        "bind_a_wound",
+        "mara_kept_the_packet",
+        "accuse_mara",
+        "leave_the_tavern"
+      ],
+      "presentNpcIds": ["mara"],
+      "revealableInformation": [
+        "People in the tavern repeat rumors.",
+        "Mara works behind the counter."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": true
+    },
+    {
+      "id": "church_contract",
+      "locationId": "church",
+      "purpose": "The parish church. Describe the room and the action's confirmed effects. Do not announce Elia's fate, the culprit, or Inés's fate unless those facts are in the applied effects.",
+      "allowedActionIds": [
+        "search_vestry",
+        "take_the_hidden_list",
+        "bar_the_vestry",
+        "accuse_alden_early",
+        "publish_the_truth",
+        "take_vengeance",
+        "keep_the_secret",
+        "leave_the_church"
+      ],
+      "presentNpcIds": ["alden"],
+      "revealableInformation": [
+        "The parish church is shut for the night.",
+        "Padre Aldren is the priest of the village."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": true
+    },
+    {
+      "id": "cemetery_contract",
+      "locationId": "cemetery",
+      "purpose": "The cemetery above the crypt. Tomás tends the graves. If the revealed lines say Elia is buried, you may acknowledge that. Do not name a killer or treat a rumor as a real monster.",
+      "allowedActionIds": [
+        "ask_tomas",
+        "follow_the_sinking_ground",
+        "read_burial_list",
+        "cut_alden_off",
+        "accuse_tomas",
+        "enter_the_crypt",
+        "leave_the_cemetery"
+      ],
+      "presentNpcIds": ["tomas"],
+      "revealableInformation": [
+        "The graves stand above the crypt.",
+        "Tomás tends the cemetery."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": true
+    },
+    {
+      "id": "archive_contract",
+      "locationId": "archive",
+      "purpose": "The village archive. Old registers may be compared. Do not announce Elia's fate unless this resolution's effects added her evidence.",
+      "allowedActionIds": [
+        "read_elias_notes",
+        "compare_registers",
+        "leave_the_archive"
+      ],
+      "presentNpcIds": [],
+      "revealableInformation": [
+        "The archive holds old registers.",
+        "Elia worked among these papers."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": false
+    },
+    {
+      "id": "crypt_contract",
+      "locationId": "crypt",
+      "purpose": "The crypt under the cemetery. Describe stone and confirmed effects. Do not announce Elia's fate or invent another midnight.",
+      "allowedActionIds": [
+        "examine_sealed_niche",
+        "trace_the_scratches",
+        "break_the_seal",
+        "descend_the_open_drop",
+        "return_to_the_cemetery"
+      ],
+      "presentNpcIds": [],
+      "revealableInformation": [
+        "The crypt lies under the cemetery.",
+        "A sealed niche is set into the wall."
+      ],
+      "forbiddenInformation": [
+        "Elia está muerta",
+        "Elia is dead",
+        "Elia sigue viva",
+        "Elia is alive",
+        "has salvado a Inés",
+        "you saved Ines",
+        "la criatura del cementerio existe",
+        "the crypt creature is real",
+        "hay una segunda medianoche",
+        "a second midnight"
+      ],
+      "generationRequired": false,
+      "freeAction": true
+    }
+  ],
+  "prologue": [
+    {
+      "id": "prologue_road",
+      "locationId": "plaza",
+      "prose": "Hace años que no ves a Elia. De jóvenes compartíais el mismo camino, y luego la vida os separó sin una pelea que pudierais nombrar. Su carta te alcanza cuando ya no esperabas noticias suyas.\n\n«Viejo amigo:\n\nNo sé si te sorprenderá recibir noticias mías después de tantos años. Ojalá pudiera decirte que escribo para recordar viejos tiempos.\n\nEstoy en un pueblo llamado Valdumbría. He encontrado algo que no consigo explicar, y cuanto más pregunto, menos respuestas obtengo.\n\nNecesito a alguien en quien pueda confiar. Alguien que no tenga nada que ver con este lugar.\n\nVen cuanto antes. Te lo contaré todo cuando llegues.\n\nElia.»\n\nNo dice quién la amenaza ni qué ha encontrado. Doblas el papel y echas a andar, convencido de que ella te espera."
+    },
+    {
+      "id": "prologue_arrival",
+      "locationId": "plaza",
+      "prose": "Cae la noche cuando entras en Valdumbría. Las calles están en silencio. Una ventana se cierra a tu paso. En la plaza, las pocas personas que quedan apartan la mirada y no responden cuando preguntas por Elia.\n\nUna mujer habla al fin, sin mirarte.\n\n—Llegas tarde para preguntar en las casas. Tomás, el enterrador, sigue en el cementerio. El camino sale hacia los cipreses.\n\nNo te dice por qué. Señala y se mete en un portal. Sigues la única indicación que te han dado."
+    },
+    {
+      "id": "prologue_grave",
+      "locationId": "cemetery",
+      "prose": "El camino termina entre los cipreses. La tierra de una fosa está recién removida.\n\nEl enterrador permanece inmóvil junto a la fosa.\n\n—No deberías haber venido.\n\nSobre la tierra húmeda descansa un pequeño medallón de cobre. Reconoces la muesca en su borde. Se la hiciste tú mismo, muchos años atrás.\n\n—¿Dónde está Elia?\n\nTomás baja la mirada.\n\n—Debajo de tus pies.\n\nEl viento agita las ramas de los cipreses.\n\nDurante unos instantes, ninguno de los dos dice nada.\n\nEntonces, desde la iglesia, suena una campana.",
+      "effects": [
+        { "type": "SET_FLAG", "key": "letter_read", "value": true },
+        { "type": "ADD_CLUE", "clueId": "clue_letter" },
+        { "type": "ADD_CLUE", "clueId": "clue_elia_dead" },
+        { "type": "DISCOVER_LOCATION", "locationId": "tavern" },
+        { "type": "MOVE_TO", "locationId": "cemetery" }
+      ]
+    }
+  ]
+}

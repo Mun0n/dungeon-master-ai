@@ -1,0 +1,30 @@
+[project]
+name = "dungeon-master-ai-backend"
+version = "0.1.0"
+description = "Stateless interpreter and narrator for Dungeon Master AI."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.142,<1",
+  "httpx>=0.28,<1",
+  "pydantic>=2.10,<3",
+  "uvicorn>=0.32,<1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+]
+
+[project.scripts]
+dungeon-master-ai-backend = "dungeon_master_ai.main:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
