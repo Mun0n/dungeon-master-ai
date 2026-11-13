@@ -89,6 +89,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dungeonmasterai.R
+import com.dungeonmasterai.presentation.dice.DiceOverlay
+import com.dungeonmasterai.presentation.dice.DiceRollOverlay
 import com.dungeonmasterai.domain.character.Attributes
 import com.dungeonmasterai.domain.character.Character
 import com.dungeonmasterai.domain.character.CharacterClass
@@ -131,20 +133,31 @@ fun ValdumbriaScreen(
             onStart = viewModel::start,
             onLeave = onLeave,
         )
-        else -> ValdumbriaPlay(
-            uiState = uiState,
-            page = page,
-            onPage = { next -> page = next },
-            scroll = scroll,
-            consumedAlign = consumedAlign,
-            onConsumedAlign = { consumedAlign = it },
-            onLeave = onLeave,
-            onChoose = viewModel::choose,
-            onContinue = viewModel::continuePrologue,
-            onSubmitText = viewModel::submitText,
-            onRetryNarration = viewModel::retryNarration,
-            onNoteHypothesis = viewModel::noteHypothesis,
-        )
+        else -> Box(modifier = Modifier.fillMaxSize()) {
+            ValdumbriaPlay(
+                uiState = uiState,
+                page = page,
+                onPage = { next -> page = next },
+                scroll = scroll,
+                consumedAlign = consumedAlign,
+                onConsumedAlign = { consumedAlign = it },
+                onLeave = onLeave,
+                onChoose = viewModel::choose,
+                onContinue = viewModel::continuePrologue,
+                onSubmitText = viewModel::submitText,
+                onRetryNarration = viewModel::retryNarration,
+                onNoteHypothesis = viewModel::noteHypothesis,
+            )
+            if (uiState.dice !is DiceOverlay.Closed) {
+                DiceRollOverlay(
+                    overlay = uiState.dice,
+                    onRoll = viewModel::confirmRoll,
+                    onWithdraw = viewModel::withdrawRoll,
+                    onSkipToResult = viewModel::holdRoll,
+                    onContinue = viewModel::finishRoll,
+                )
+            }
+        }
     }
 }
 
@@ -443,7 +456,8 @@ private fun ValdumbriaPlay(
     onNoteHypothesis: (String) -> Unit,
 ) {
     val playing = uiState.endingId == null && uiState.phase == AdventurePhase.IDLE
-    val controlsEnabled = playing && !uiState.resolving
+    val rollOpen = uiState.dice !is DiceOverlay.Closed
+    val controlsEnabled = playing && !uiState.resolving && !rollOpen
     var writing by rememberSaveable(uiState.locationId, uiState.freeAction) { mutableStateOf(false) }
     val reduceMotion = reducedMotion()
     var narrationY by remember { mutableIntStateOf(0) }
@@ -508,7 +522,7 @@ private fun ValdumbriaPlay(
             if (!uiState.resolving) {
                 uiState.notice?.let { Text(it) }
             }
-            if (uiState.resolving) {
+            if (uiState.resolving && !rollOpen) {
                 ResolvingPlate(reduceMotion = reduceMotion)
             } else if (uiState.phase == AdventurePhase.NARRATION_PENDING && uiState.endingId == null) {
                 Text(PlayerCopy.NARRATION_PENDING)

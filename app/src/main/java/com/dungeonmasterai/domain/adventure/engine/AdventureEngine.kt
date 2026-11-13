@@ -12,6 +12,7 @@ import com.dungeonmasterai.domain.character.Item
 import com.dungeonmasterai.domain.dice.CheckResult
 import com.dungeonmasterai.domain.dice.Die
 import com.dungeonmasterai.domain.dice.Difficulty
+import com.dungeonmasterai.domain.dice.OfferedCheck
 import com.dungeonmasterai.domain.dice.resolveCheck
 import com.dungeonmasterai.domain.adventure.state.AdventureLog
 import com.dungeonmasterai.domain.adventure.state.AdventureRejection
@@ -108,6 +109,21 @@ open class AdventureEngine(
             return ActionAccess.REQUIREMENTS_BLOCKED
         }
         return ActionAccess.AVAILABLE
+    }
+
+    /**
+     * Reads the check an available action would roll.
+     * It does not roll and it does not change state.
+     */
+    fun offeredCheck(state: AdventureState, actionId: String): OfferedCheck? {
+        if (access(state, actionId) != ActionAccess.AVAILABLE) return null
+        val definition = actions[actionId]?.check ?: return null
+        val attribute = Attribute.valueOf(definition.attribute)
+        return OfferedCheck(
+            attribute = definition.attribute,
+            modifier = state.character.attributes.value(attribute),
+            difficulty = definition.difficulty,
+        )
     }
 
     /**

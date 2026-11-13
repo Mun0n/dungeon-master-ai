@@ -42,6 +42,9 @@ android {
         targetSdk = 37
         versionCode = 1
         versionName = "0.1.0"
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
         buildConfigField("String", "NARRATOR_BASE_URL", narratorBaseUrl.asJavaStringLiteral())
         buildConfigField("String", "ADVENTURE_BACKEND_URL", adventureBackendUrl.asJavaStringLiteral())
     }
@@ -78,6 +81,9 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.room.runtime)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.filament.android)
+    implementation(libs.filament.utils.android)
+    implementation(libs.filamat.android)
     ksp(libs.room.compiler)
 
     testImplementation(libs.junit)

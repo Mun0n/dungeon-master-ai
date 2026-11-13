@@ -40,6 +40,16 @@ data class CheckResult(
     val success: Boolean,
 )
 
+/**
+ * A check an available action would roll.
+ * Reading it does not roll and does not change state.
+ */
+data class OfferedCheck(
+    val attribute: String,
+    val modifier: Int,
+    val difficulty: Int,
+)
+
 fun resolveCheck(
     roll: Int,
     attribute: Int,

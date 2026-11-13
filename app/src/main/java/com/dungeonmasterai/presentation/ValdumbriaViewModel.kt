@@ -11,13 +11,18 @@ import com.dungeonmasterai.domain.adventure.engine.decisionOffer
 import com.dungeonmasterai.domain.adventure.engine.pendingPrologueBeat
 import com.dungeonmasterai.domain.adventure.engine.offersConclusion
 import com.dungeonmasterai.domain.adventure.load.loadAdventure
+import android.os.SystemClock
 import com.dungeonmasterai.domain.adventure.state.AdventureLog
 import com.dungeonmasterai.domain.adventure.state.clockFace
 import com.dungeonmasterai.domain.character.Character
 import com.dungeonmasterai.domain.character.CharacterClass
 import com.dungeonmasterai.domain.character.Presentation
+import com.dungeonmasterai.domain.dice.CheckResult
 import com.dungeonmasterai.domain.dice.Die
 import com.dungeonmasterai.domain.dice.RandomDie
+import com.dungeonmasterai.presentation.dice.DiceOverlay
+import com.dungeonmasterai.presentation.dice.DiceOverlayModel
+import com.dungeonmasterai.presentation.dice.PendingThrow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,6 +71,7 @@ data class ValdumbriaUiState(
     val alignToken: Int = 0,
     val historySize: Int = 0,
     val resolving: Boolean = false,
+    val dice: DiceOverlay = DiceOverlay.Closed,
 )
 
 class ValdumbriaViewModel(
@@ -73,6 +79,8 @@ class ValdumbriaViewModel(
     private val engine: AdventureEngine,
 ) : ViewModel() {
     private val gate = Mutex()
+    private val dice = DiceOverlayModel()
+    private var heldRoll: HeldRoll? = null
     private val _uiState = MutableStateFlow(ValdumbriaUiState())
     val uiState: StateFlow<ValdumbriaUiState> = _uiState.asStateFlow()
 
@@ -95,11 +103,41 @@ class ValdumbriaViewModel(
     }
 
     fun reload() {
+        if (_uiState.value.dice !is DiceOverlay.Closed) {
+            viewModelScope.launch {
+                gate.withLock {
+                    val snapshot = session.restore()
+                    if (!dice.keepAfterRestore(snapshot.record?.revision)) {
+                        heldRoll = null
+                        _uiState.value = present(_uiState.value, snapshot, playerActed = false)
+                    }
+                }
+            }
+            return
+        }
         turn(playerActed = false) { session.restore() }
     }
 
     fun choose(actionId: String) {
-        turn(playerActed = true) { session.choose(actionId) }
+        if (rollBusy()) return
+        _uiState.value = beginResolution(_uiState.value)
+        viewModelScope.launch {
+            gate.withLock {
+                val before = _uiState.value
+                try {
+                    val parked = session.parkedCheck(actionId)
+                    if (parked != null) {
+                        openRoll(before, actionId, actionId, parked)
+                    } else {
+                        val snapshot = session.choose(actionId)
+                        _uiState.value = finishResolution(present(before, snapshot, playerActed = true))
+                    }
+                } catch (error: Exception) {
+                    _uiState.value = before.copy(resolving = false, dice = DiceOverlay.Closed)
+                    throw error
+                }
+            }
+        }
     }
 
     fun continuePrologue() {
@@ -107,7 +145,93 @@ class ValdumbriaViewModel(
     }
 
     fun submitText(text: String) {
-        turn(playerActed = true) { session.submitText(text) }
+        if (rollBusy()) return
+        _uiState.value = beginResolution(_uiState.value)
+        viewModelScope.launch {
+            gate.withLock {
+                val before = _uiState.value
+                try {
+                    when (val prepared = session.prepareText(text)) {
+                        is PreparedText.Settled -> {
+                            _uiState.value = finishResolution(present(before, prepared.snapshot, playerActed = true))
+                        }
+                        is PreparedText.Action -> {
+                            val parked = session.parkedCheck(prepared.actionId)
+                            if (parked != null) {
+                                openRoll(before, prepared.actionId, prepared.sentence, parked)
+                            } else {
+                                val snapshot = session.resolveChoice(prepared.actionId, prepared.sentence)
+                                _uiState.value = finishResolution(present(before, snapshot, playerActed = true))
+                            }
+                        }
+                    }
+                } catch (error: Exception) {
+                    _uiState.value = before.copy(resolving = false, dice = DiceOverlay.Closed)
+                    throw error
+                }
+            }
+        }
+    }
+
+    fun confirmRoll() {
+        viewModelScope.launch {
+            gate.withLock {
+                val pending = dice.requestThrow() ?: return@withLock
+                val before = _uiState.value
+                _uiState.value = before.copy(dice = dice.overlay, resolving = true, notice = null)
+                try {
+                    val snapshot = session.resolveChoice(pending.actionId, pending.playerText)
+                    val check = freshCheck(before.historySize, snapshot, pending.actionId)
+                    if (check == null) {
+                        dice.close()
+                        heldRoll = null
+                        _uiState.value = finishResolution(present(before, snapshot, playerActed = true))
+                    } else {
+                        dice.committed(checkReading(check, pending.attribute), SystemClock.uptimeMillis())
+                        heldRoll = HeldRoll(before, snapshot)
+                        _uiState.value = before.copy(dice = dice.overlay, resolving = true, notice = null)
+                    }
+                } catch (error: Exception) {
+                    dice.close()
+                    heldRoll = null
+                    _uiState.value = before.copy(resolving = false, dice = DiceOverlay.Closed)
+                    throw error
+                }
+            }
+        }
+    }
+
+    fun withdrawRoll() {
+        viewModelScope.launch {
+            gate.withLock {
+                if (dice.overlay !is DiceOverlay.Waiting) return@withLock
+                dice.close()
+                heldRoll = null
+                _uiState.value = _uiState.value.copy(dice = DiceOverlay.Closed, resolving = false)
+            }
+        }
+    }
+
+    fun holdRoll() {
+        viewModelScope.launch {
+            gate.withLock {
+                dice.hold()
+                _uiState.value = _uiState.value.copy(dice = dice.overlay)
+            }
+        }
+    }
+
+    fun finishRoll() {
+        viewModelScope.launch {
+            gate.withLock {
+                val held = heldRoll
+                if (held == null || dice.overlay !is DiceOverlay.Holding) return@withLock
+                dice.close()
+                heldRoll = null
+                _uiState.value = finishResolution(present(held.before, held.snapshot, playerActed = true))
+                    .copy(animateCheck = false)
+            }
+        }
     }
 
     fun noteHypothesis(text: String) {
@@ -118,12 +242,37 @@ class ValdumbriaViewModel(
         turn(playerActed = true) { session.retryNarration() }
     }
 
+    private fun rollBusy(): Boolean =
+        _uiState.value.resolving || _uiState.value.dice !is DiceOverlay.Closed
+
+    private fun openRoll(before: ValdumbriaUiState, actionId: String, playerText: String, parked: ParkedCheck) {
+        dice.open(
+            PendingThrow(
+                actionId = actionId,
+                playerText = playerText,
+                attribute = parked.check.attribute,
+                modifier = parked.check.modifier,
+                difficulty = parked.check.difficulty,
+                revision = parked.revision,
+            ),
+        )
+        _uiState.value = before.copy(resolving = false, notice = null, dice = dice.overlay)
+    }
+
     private fun turn(playerActed: Boolean, block: suspend () -> AdventureSessionSnapshot) {
-        if (playerActed && _uiState.value.resolving) return
+        if (playerActed && rollBusy()) return
         if (playerActed) _uiState.value = beginResolution(_uiState.value)
         viewModelScope.launch {
             gate.withLock {
                 val before = _uiState.value
+                if (!playerActed && before.dice !is DiceOverlay.Closed) {
+                    val snapshot = block()
+                    if (!dice.keepAfterRestore(snapshot.record?.revision)) {
+                        heldRoll = null
+                        _uiState.value = present(before, snapshot, playerActed = false)
+                    }
+                    return@withLock
+                }
                 try {
                     val snapshot = block()
                     val presented = present(before, snapshot, playerActed)
@@ -245,6 +394,33 @@ class ValdumbriaViewModel(
             historySize = historySize,
         )
     }
+}
+
+private data class HeldRoll(
+    val before: ValdumbriaUiState,
+    val snapshot: AdventureSessionSnapshot,
+)
+
+private fun freshCheck(
+    previousHistorySize: Int,
+    snapshot: AdventureSessionSnapshot,
+    actionId: String,
+): CheckResult? {
+    val state = snapshot.record?.state ?: return null
+    return checkAddedByThisCommit(state.history, previousHistorySize, actionId)
+}
+
+internal fun checkAddedByThisCommit(
+    history: List<AdventureLog>,
+    previousHistorySize: Int,
+    actionId: String,
+): CheckResult? {
+    if (history.size <= previousHistorySize) return null
+    val added = history.subList(previousHistorySize, history.size)
+    val resolved = added.lastOrNull {
+        it is AdventureLog.ActionResolved && it.actionId == actionId
+    } as? AdventureLog.ActionResolved
+    return resolved?.check
 }
 
 internal fun beginResolution(state: ValdumbriaUiState): ValdumbriaUiState =

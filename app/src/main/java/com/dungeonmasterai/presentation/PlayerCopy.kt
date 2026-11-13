@@ -19,6 +19,14 @@ internal object PlayerCopy {
     const val MENU_MARK: String = "v1.0.4 • UNWRITTEN STUDIOS"
     const val HOW_TO_PLAY: String = "Cómo jugar"
     const val HOW_TO_PLAY_DETAIL: String = "Decisiones, dados y destino"
+    const val LABORATORY: String = "Laboratorio"
+    const val LABORATORY_DETAIL: String = "Probar el dado sin abrir una partida"
+    const val LAB_NOTE: String =
+        "La tirada la decide el motor de reglas. Esta pantalla no lee ni escribe la partida."
+    const val LAB_FREE_ROLL: String = "Tirada libre"
+    const val LAB_NATURAL_ONE: String = "Natural 1"
+    const val LAB_NATURAL_TWENTY: String = "Natural 20"
+    const val LAB_MODIFIER: String = "Modificador"
     const val HOW_DECISIONS: String =
         "Eliges una de las decisiones de la escena. Si la escena lo permite, «Intentar otra cosa» abre una acción que escribes tú."
     const val HOW_DICE: String =
@@ -85,6 +93,12 @@ internal object PlayerCopy {
     const val NARRATION_NOT_SAVED: String = "La narración no se ha guardado."
     const val GAME_ALREADY_SAVED: String = "Ya hay una partida guardada."
     const val SKIP_ROLL: String = "Omitir"
+    const val SHAKE_TO_ROLL: String = "Agita el móvil para lanzar"
+    const val TAP_TO_ROLL: String = "Toca para lanzar"
+    const val ROLL_DIE: String = "Lanzar"
+    const val WITHDRAW_HAND: String = "Apartar la mano"
+
+    fun checkHeading(attribute: String): String = "Prueba de $attribute"
     const val DIE: String = "Dado"
     const val ATTRIBUTE: String = "Atributo"
     const val MODIFIER: String = "Modificador"

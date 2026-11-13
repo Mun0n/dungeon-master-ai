@@ -55,7 +55,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.dungeonmasterai.BuildConfig
 import com.dungeonmasterai.R
+import com.dungeonmasterai.presentation.dice.DiceLaboratory
 import java.util.Locale
 
 @Composable
@@ -67,9 +69,11 @@ internal fun UnwrittenMenu(
 ) {
     var mode by rememberSaveable { mutableStateOf(MODE_MENU) }
     var sessionKey by rememberSaveable { mutableIntStateOf(0) }
-    when (mode) {
+    val shown = if (mode == MODE_LAB && !BuildConfig.DEBUG) MODE_MENU else mode
+    when (shown) {
         MODE_ADVENTURE -> adventure(sessionKey) { mode = MODE_MENU }
         MODE_GUIDE -> HowToPlay(onBack = { mode = MODE_MENU })
+        MODE_LAB -> DiceLaboratory(onBack = { mode = MODE_MENU })
         else -> MenuHome(
             titles = titles,
             loadResume = loadResume,
@@ -80,6 +84,11 @@ internal fun UnwrittenMenu(
                 mode = MODE_ADVENTURE
             },
             onGuide = { mode = MODE_GUIDE },
+            onLaboratory = if (BuildConfig.DEBUG) {
+                { mode = MODE_LAB }
+            } else {
+                null
+            },
         )
     }
 }
@@ -92,6 +101,7 @@ private fun MenuHome(
     onContinue: () -> Unit,
     onNewGame: () -> Unit,
     onGuide: () -> Unit,
+    onLaboratory: (() -> Unit)?,
 ) {
     var resume by remember { mutableStateOf<MenuResume?>(null) }
     var ready by remember { mutableStateOf(false) }
@@ -258,6 +268,22 @@ private fun MenuHome(
                                 trailingTint = MenuOutline,
                                 onClick = onGuide,
                             )
+                            if (onLaboratory != null) {
+                                MenuAction(
+                                    label = PlayerCopy.LABORATORY,
+                                    detail = PlayerCopy.LABORATORY_DETAIL,
+                                    icon = ICON_LAB,
+                                    trailing = ICON_CHEVRON,
+                                    background = Brush.horizontalGradient(
+                                        listOf(scheme.surfaceContainerLow, scheme.surfaceContainerLow),
+                                    ),
+                                    well = scheme.surfaceContainer,
+                                    iconTint = MenuOutline,
+                                    labelColor = scheme.onSurface,
+                                    trailingTint = MenuOutline,
+                                    onClick = onLaboratory,
+                                )
+                            }
                         }
                     }
                 }
@@ -462,7 +488,9 @@ private const val ICON_CODEX: String = "\uEA3E"
 private const val ICON_ARROW: String = "\uE5C8"
 private const val ICON_STORIES: String = "\uE666"
 private const val ICON_BOOK: String = "\uEA19"
+private const val ICON_LAB: String = "\uEA4B"
 
 private const val MODE_MENU: String = "menu"
 private const val MODE_ADVENTURE: String = "valdumbria"
 private const val MODE_GUIDE: String = "guide"
+private const val MODE_LAB: String = "lab"

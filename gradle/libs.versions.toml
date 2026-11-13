@@ -10,6 +10,7 @@ ksp = "2.3.12"
 room = "2.8.5"
 sqlite = "2.6.2"
 kotlinxSerialization = "1.11.0"
+filament = "1.80.0"
 
 [libraries]
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
@@ -26,6 +27,9 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 sqlite-bundled-jvm = { module = "androidx.sqlite:sqlite-bundled-jvm", version.ref = "sqlite" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+filament-android = { module = "com.google.android.filament:filament-android", version.ref = "filament" }
+filament-utils-android = { module = "com.google.android.filament:filament-utils-android", version.ref = "filament" }
+filamat-android = { module = "com.google.android.filament:filamat-android", version.ref = "filament" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

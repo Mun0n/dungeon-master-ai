@@ -42,6 +42,7 @@ import com.dungeonmasterai.domain.adventure.narration.narrationView
 import com.dungeonmasterai.domain.adventure.state.AdventureRejection
 import com.dungeonmasterai.domain.adventure.state.AdventureResolution
 import com.dungeonmasterai.domain.character.Character
+import com.dungeonmasterai.domain.dice.OfferedCheck
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.sync.Mutex
@@ -53,6 +54,17 @@ enum class AdventurePhase {
     NARRATION_PENDING,
     SCENE_PAUSED,
 }
+
+sealed interface PreparedText {
+    data class Settled(val snapshot: AdventureSessionSnapshot) : PreparedText
+
+    data class Action(val actionId: String, val sentence: String) : PreparedText
+}
+
+data class ParkedCheck(
+    val check: OfferedCheck,
+    val revision: Int,
+)
 
 data class AdventureSessionSnapshot(
     val ready: Boolean = false,
@@ -108,76 +120,24 @@ class AdventureSession(
     }
 
     suspend fun submitText(text: String): AdventureSessionSnapshot = gate.withLock {
-        if (!snapshot.ready) loadIntoSnapshot()
-        val current = playableRecord() ?: return@withLock snapshot
-        if (prologueOpen(current)) {
-            snapshot = snapshot.copy(notice = PlayerCopy.ACTION_UNAVAILABLE)
-            return@withLock snapshot
-        }
-        val sentence = text.trim()
-        if (!fitsPlayerText(sentence)) {
-            snapshot = snapshot.copy(notice = PlayerCopy.ACTION_LENGTH)
-            return@withLock snapshot
-        }
-        val view = viewOf(current)
-        val available = availableIds(current, view)
-        val actionId = if (view == null || backend == null) {
-            localActionId(sentence, available)
-        } else {
-            val requestId = newRequestId()
-            val call = call { 
-                backend.interpret(
-                    InterpretationRequest(
-                        contractVersion = 1,
-                        requestId = requestId,
-                        stateRevision = revisionToken(current.revision),
-                        sceneContract = view.toContractBody(activeForbidden(current)),
-                        authorizedContext = view.toContextBody(),
-                        playerText = sentence,
-                        narrativeLanguage = engine.adventure.narrativeLanguage,
-                    ),
-                )
-            }
-            if (call is BackendCall.Failed) {
-                snapshot = snapshot.copy(notice = interpretationFailureNotice(call.code))
-                return@withLock snapshot
-            }
-            when (
-                val decision = interpretReply(
-                    call = call,
-                    requestId = requestId,
-                    stateRevision = revisionToken(current.revision),
-                    sceneContractId = view.contract.id,
-                    available = view.availableActions.map { it.id }.toSet(),
-                    unavailable = view.unavailableActionIds.toSet(),
-                    blocked = view.blockedActionIds.toSet(),
-                    offered = view.availableConclusions,
-                )
-            ) {
-                is InterpretationDecision.Recognized -> decision.actionId
-                is InterpretationDecision.Conclusion -> {
-                    conclude(current, sentence, view, decision)
-                    return@withLock snapshot
-                }
-                is InterpretationDecision.UnusableConclusion -> {
-                    snapshot = snapshot.copy(notice = CONCLUSION_REJECTED)
-                    return@withLock snapshot
-                }
-                is InterpretationDecision.Declined -> {
-                    snapshot = snapshot.copy(notice = PlayerCopy.NO_ACTION)
-                    return@withLock snapshot
-                }
-                is InterpretationDecision.Unusable -> localActionId(sentence, available)
+        when (val prepared = prepareLocked(text)) {
+            is PreparedText.Settled -> prepared.snapshot
+            is PreparedText.Action -> {
+                val current = playableRecord() ?: return@withLock snapshot
+                resolve(current, prepared.actionId, prepared.sentence, viewOf(current))
             }
         }
-        if (actionId == null) {
-            snapshot = snapshot.copy(notice = PlayerCopy.NO_ACTION)
-            return@withLock snapshot
-        }
-        resolve(current, actionId, sentence, view)
     }
 
-    suspend fun choose(actionId: String): AdventureSessionSnapshot = gate.withLock {
+    /**
+     * Interprets one sentence and stops before the rules run.
+     * A recognized action is returned so the screen can wait for a roll.
+     */
+    suspend fun prepareText(text: String): PreparedText = gate.withLock { prepareLocked(text) }
+
+    suspend fun choose(actionId: String): AdventureSessionSnapshot = resolveChoice(actionId, actionId)
+
+    suspend fun resolveChoice(actionId: String, playerText: String): AdventureSessionSnapshot = gate.withLock {
         if (!snapshot.ready) loadIntoSnapshot()
         val current = playableRecord() ?: return@withLock snapshot
         if (prologueOpen(current)) {
@@ -185,16 +145,25 @@ class AdventureSession(
             return@withLock snapshot
         }
         val view = viewOf(current)
-        val allowed = if (view == null) {
-            engine.access(current.state, actionId) == ActionAccess.AVAILABLE
-        } else {
-            actionId in view.availableActions.map { it.id }
-        }
-        if (!allowed) {
+        if (!actionAllowed(current, actionId, view)) {
             snapshot = snapshot.copy(notice = PlayerCopy.ACTION_UNAVAILABLE)
             return@withLock snapshot
         }
-        resolve(current, actionId, actionId, view)
+        resolve(current, actionId, playerText, view)
+    }
+
+    /**
+     * The check the player would roll, plus the revision that offer belongs to.
+     * It does not roll.
+     */
+    suspend fun parkedCheck(actionId: String): ParkedCheck? = gate.withLock {
+        val current = snapshot.record ?: return@withLock null
+        if (!snapshot.ready || snapshot.phase != AdventurePhase.IDLE) return@withLock null
+        if (prologueOpen(current)) return@withLock null
+        val view = viewOf(current)
+        if (!actionAllowed(current, actionId, view)) return@withLock null
+        val offer = engine.offeredCheck(current.state, actionId) ?: return@withLock null
+        ParkedCheck(check = offer, revision = current.revision)
     }
 
     suspend fun noteHypothesis(text: String): AdventureSessionSnapshot = gate.withLock {
@@ -596,6 +565,86 @@ class AdventureSession(
         appliedEffects = accepted.appliedEffects,
         text = null,
     )
+
+    private suspend fun prepareLocked(text: String): PreparedText {
+        if (!snapshot.ready) loadIntoSnapshot()
+        val current = playableRecord() ?: return PreparedText.Settled(snapshot)
+        if (prologueOpen(current)) {
+            snapshot = snapshot.copy(notice = PlayerCopy.ACTION_UNAVAILABLE)
+            return PreparedText.Settled(snapshot)
+        }
+        val sentence = text.trim()
+        if (!fitsPlayerText(sentence)) {
+            snapshot = snapshot.copy(notice = PlayerCopy.ACTION_LENGTH)
+            return PreparedText.Settled(snapshot)
+        }
+        val view = viewOf(current)
+        val available = availableIds(current, view)
+        val actionId = if (view == null || backend == null) {
+            localActionId(sentence, available)
+        } else {
+            val requestId = newRequestId()
+            val call = call {
+                backend.interpret(
+                    InterpretationRequest(
+                        contractVersion = 1,
+                        requestId = requestId,
+                        stateRevision = revisionToken(current.revision),
+                        sceneContract = view.toContractBody(activeForbidden(current)),
+                        authorizedContext = view.toContextBody(),
+                        playerText = sentence,
+                        narrativeLanguage = engine.adventure.narrativeLanguage,
+                    ),
+                )
+            }
+            if (call is BackendCall.Failed) {
+                snapshot = snapshot.copy(notice = interpretationFailureNotice(call.code))
+                return PreparedText.Settled(snapshot)
+            }
+            when (
+                val decision = interpretReply(
+                    call = call,
+                    requestId = requestId,
+                    stateRevision = revisionToken(current.revision),
+                    sceneContractId = view.contract.id,
+                    available = view.availableActions.map { it.id }.toSet(),
+                    unavailable = view.unavailableActionIds.toSet(),
+                    blocked = view.blockedActionIds.toSet(),
+                    offered = view.availableConclusions,
+                )
+            ) {
+                is InterpretationDecision.Recognized -> decision.actionId
+                is InterpretationDecision.Conclusion -> {
+                    conclude(current, sentence, view, decision)
+                    return PreparedText.Settled(snapshot)
+                }
+                is InterpretationDecision.UnusableConclusion -> {
+                    snapshot = snapshot.copy(notice = CONCLUSION_REJECTED)
+                    return PreparedText.Settled(snapshot)
+                }
+                is InterpretationDecision.Declined -> {
+                    snapshot = snapshot.copy(notice = PlayerCopy.NO_ACTION)
+                    return PreparedText.Settled(snapshot)
+                }
+                is InterpretationDecision.Unusable -> localActionId(sentence, available)
+            }
+        }
+        if (actionId == null) {
+            snapshot = snapshot.copy(notice = PlayerCopy.NO_ACTION)
+            return PreparedText.Settled(snapshot)
+        }
+        return PreparedText.Action(actionId, sentence)
+    }
+
+    private fun actionAllowed(
+        record: AdventureRecord,
+        actionId: String,
+        view: NarrationView?,
+    ): Boolean = if (view == null) {
+        engine.access(record.state, actionId) == ActionAccess.AVAILABLE
+    } else {
+        actionId in view.availableActions.map { it.id }
+    }
 
     private fun playableRecord(): AdventureRecord? {
         val current = snapshot.record
